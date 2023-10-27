@@ -220,12 +220,12 @@ async function install_plain_lua_windows(
     }
   });
 
-  objs["lua"] = [...objs["lua"], ...objs["lib"]];
-  objs["luac"] = [...objs["luac"], ...objs["lib"]];
-
   let luaXYZ = luaVersion.split(".");
   let libFile = "lua" + luaXYZ[0] + luaXYZ[1] + ".lib";
   let dllFile = "lua" + luaXYZ[0] + luaXYZ[1] + ".dll";
+
+  objs["lua"] = [...objs["lua"], libFile];
+  objs["luac"] = [...objs["luac"], ...objs["lib"]];
 
   await msvc_link(luaExtractPath, "link /nologo /DLL", dllFile, objs["lib"]);
   await msvc_link(luaExtractPath, "link /nologo", "luac.exe", objs["luac"]);
@@ -239,6 +239,7 @@ async function install_plain_lua_windows(
   await install_files(pathJoin(luaInstallPath, "bin"), luaExtractPath, [
     "lua.exe",
     "luac.exe",
+    dllFile,
   ]);
   await install_files(pathJoin(luaInstallPath, "lib"), luaExtractPath, [
     dllFile,
