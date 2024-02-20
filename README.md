@@ -1,19 +1,22 @@
 # Github Action for Lua and LuaJIT
 
-### `leafo/gh-actions-lua`
+### `jkl1337/gh-actions-lua`
 
-[![Actions Status](https://github.com/leafo/gh-actions-lua/workflows/test/badge.svg)](https://github.com/leafo/gh-actions-lua/actions)
+[![Actions Status](https://github.com/jkl1337/gh-actions-lua/workflows/test/badge.svg)](https://github.com/jkl1337/gh-actions-lua/actions)
 
-**Note**: You must use version 8 or greater as GitHub has
-deprecated older versions of the actions core libraries.
+This is a fork of leafo/gh-action-lua.
 
 Builds and installs Lua into the `.lua/` directory in the working directory.
 Adds the `.lua/bin` to the `PATH` environment variable so `lua` can be called
 directly in workflows.
 
+In addition to a few bug fixes this action works with most versions of LuaJIT including the
+current development branch and openresty branch. It also installs LuaJIT "properly" on Windows
+per documentation including a correctly installed jit.* library.
+
 Other Lua GitHub actions:
 
-* [`leafo/gh-actions-luarocks`](https://github.com/leafo/gh-actions-luarocks)
+* [`jkl1337/gh-actions-luarocks`](https://github.com/jkl1337/gh-actions-luarocks)
   * inputs: `luarocksVersion`
 
 
@@ -22,32 +25,48 @@ Other Lua GitHub actions:
 Install Lua: (Will typically default to the latest release, 5.4.4 as of this readme)
 
 ```yaml
-- uses: leafo/gh-actions-lua@v10
+- uses: jkl1337/gh-actions-lua@v11
 ```
 
 Install specific version of Lua:
 
 ```yaml
-- uses: leafo/gh-actions-lua@v10
+- uses: jkl1337/gh-actions-lua@v11
   with:
     luaVersion: "5.1.5"
+```
+
+Install LuaJIT openresty:
+
+```yaml
+- uses: jkl1337/gh-actions-lua@v11
+  with:
+    luaVersion: "luajit-openresty"
+```
+
+Install LuaJIT latest git:
+
+```yaml
+- uses: jkl1337/gh-actions-lua@v11
+  with:
+    luaVersion: "luajit-git"
 ```
 
 Install specific version of LuaJIT:
 
 ```yaml
-- uses: leafo/gh-actions-lua@v10
+- uses: jkl1337/gh-actions-lua@v11
   with:
     luaVersion: "luajit-2.1.0-beta3"
 ```
 
 When using Windows the following prerequisite action must be run before
-building Lua: [`ilammy/msvc-dev-cmd@v1`](https://github.com/ilammy/msvc-dev-cmd). It is safe to
-include this line on non-Windows platforms, as the action will do nothing in those cases.
+building PUC-Lua (not LuaJIT): [`ilammy/msvc-dev-cmd@v1`](https://github.com/ilammy/msvc-dev-cmd).
+It is safe to include this line on non-Windows platforms, as the action will do nothing in those cases.
 
 ```yaml
 - uses: ilammy/msvc-dev-cmd@v1
-- uses: leafo/gh-actions-lua@v10
+- uses: jkl1337/gh-actions-lua@v11
 ```
 
 ## Inputs
@@ -68,17 +87,19 @@ Examples of versions:
 * `"luajit-2.0.5"`
 * `"luajit-2.1.0-beta3"`
 * `"luajit-openresty"`
+* `"luajit-git"`
 
 The version specifies where the source is downloaded from:
 
-* `luajit-openresty` — will allways pull master from  https://github.com/openresty/luajit2
+* `luajit-openresty` — will always pull master from  https://github.com/openresty/luajit2
+* `luajit-git` — will pull the default branch from  https://github.com/LuaJIT/LuaJIT
 * Anything starting with `luajit-` — from http://luajit.org/download.html
 * Anything else — from https://www.lua.org/ftp/
 
 **Version aliases**
 
 You can use shorthand `5.1`, `5.2`, `5.3`, `5.4`, `luajit` version aliases to point to the
-latest (or recent) version of Lua for that version.
+latest (or recent) version of Lua for that version. `luajit` points to openresty.
 
 ### `luaCompileFlags`
 
@@ -89,7 +110,7 @@ Additional flags to pass to `make` when building Lua.
 Example value:
 
 ```yaml
-- uses: leafo/gh-actions-lua@master
+- uses: jkl1337/gh-actions-lua@master
   with:
     luaVersion: 5.3
     luaCompileFlags: LUA_CFLAGS="-DLUA_INT_TYPE=LUA_INT_INT"
@@ -116,11 +137,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - uses: leafo/gh-actions-lua@v10
+    - uses: jkl1337/gh-actions-lua@v11
       with:
         luaVersion: "5.1.5"
 
-    - uses: leafo/gh-actions-luarocks@v4
+    - uses: jkl1337/gh-actions-luarocks@v4
 
     - name: build
       run: |
@@ -149,11 +170,11 @@ jobs:
   test:
     strategy:
       matrix:
-        luaVersion: ["5.1.5", "5.2.4", "luajit-2.1.0-beta3"]
+        luaVersion: ["5.1.5", "5.2.4", "luajit-openresty"]
 
     steps:
     - uses: actions/checkout@master
-    - uses: leafo/gh-actions-lua@v10
+    - uses: jkl1337/gh-actions-lua@v11
       with:
         luaVersion: ${{ matrix.luaVersion }}
 
